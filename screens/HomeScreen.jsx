@@ -8,6 +8,7 @@ import EmptyList from "../components/EmptyList";
 import Search from "../components/Search";
 import Card from "../components/Card";
 import {useEffect, useState} from "react";
+import {getObjects, saveObjects} from "../storage/LocalStorage";
 
 export default function HomeScreen() {
     const [lista, setLista] = useState([])
@@ -15,6 +16,16 @@ export default function HomeScreen() {
     const [totalConcluido, setTotalConcluido] = useState(0)
     const [textCadastro, setTextCadastro] = useState("")
     const [textFiltro, setTextFiltro] = useState("")
+
+    useEffect(() => {
+        // Recupera as tarefas do AsyncStorage
+        async function fetchData() {
+            var listaAux = await getObjects("listaTarefas")
+            setLista(listaAux ? listaAux : [])
+        }
+
+        fetchData()
+    }, [])
 
     useEffect(() => {
         // Total de tarefas concluidas
@@ -35,7 +46,7 @@ export default function HomeScreen() {
 
     }, [lista]);
 
-    function cadastrarTarefa() {
+    async function cadastrarTarefa() {
         var listaAux = [...lista]
 
         if (textCadastro.trim() === "") {
@@ -59,6 +70,8 @@ export default function HomeScreen() {
             titulo: textCadastro,
             concluido: false
         })
+
+        await saveObjects("listaTarefas", listaAux)
 
         console.log(listaAux)
 
