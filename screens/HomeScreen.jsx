@@ -1,4 +1,4 @@
-import {Text, View, StyleSheet, ScrollView} from "react-native";
+import {Text, View, StyleSheet, ScrollView, Alert} from "react-native";
 import Header from "../components/Header";
 import FormCadastro from "../components/FormCadastro";
 import BtnCont from "../components/BtnCont";
@@ -14,6 +14,7 @@ export default function HomeScreen() {
     const [totalCriado, setTotalCriado] = useState(0)
     const [totalConcluido, setTotalConcluido] = useState(0)
     const [textCadastro, setTextCadastro] = useState("")
+    const [textFiltro, setTextFiltro] = useState("")
 
     useEffect(() => {
         // Total de tarefas concluidas
@@ -37,6 +38,23 @@ export default function HomeScreen() {
     function cadastrarTarefa() {
         var listaAux = [...lista]
 
+        if (textCadastro.trim() === "") {
+            Alert.alert("Impossivel cadastrar tarefa vazia.")
+            return false;
+        }
+
+        var jaExiste = listaAux.find(function (item) {
+            if (item.titulo.toLowerCase() === textCadastro.toLowerCase()) {
+                return true
+            }
+            return false
+        })
+
+        if (jaExiste) {
+            Alert.alert("Essa tarefa já existe.")
+            return false;
+        }
+
         listaAux.push({
             titulo: textCadastro,
             concluido: false
@@ -50,7 +68,13 @@ export default function HomeScreen() {
 
     function concluirTarefa(index) {
         var listaAux = [...lista]
-        listaAux[index].concluido = true
+
+        if(listaAux[index].concluido === true) {
+            listaAux[index].concluido = false
+        } else {
+            listaAux[index].concluido = true
+        }
+
         setLista(listaAux)
     }
 
@@ -72,19 +96,25 @@ export default function HomeScreen() {
                 <BtnCont titulo={"Concluídas"} numero={totalConcluido} isGreen={true} />
             </View>
 
-            <Search />
+            <Search texto={textFiltro} setTexto={setTextFiltro} />
 
             {lista.length === 0 && <EmptyList />}
 
-            {lista.map(function (item, index) {
-                return (
-                    <Card key={index}
-                          texto={item.titulo}
-                          ativo={item.concluido}
-                          fnConcluir={() => concluirTarefa(index)}
-                          fnExcluir={() => excluirTarefa(index)}
-                    />
-                )
+            {lista
+                .sort(function (a, b) {
+                    return a.concluido - b.concluido
+                })
+                .map(function (item, index) {
+                if (item.titulo.toLowerCase().includes(textFiltro.toLowerCase())) {
+                    return (
+                        <Card key={index}
+                              texto={item.titulo}
+                              ativo={item.concluido}
+                              fnConcluir={() => concluirTarefa(index)}
+                              fnExcluir={() => excluirTarefa(index)}
+                        />
+                    )
+                }
             })}
 
         </ScrollView>
