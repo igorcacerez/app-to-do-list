@@ -2,7 +2,12 @@ import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import sizes from "../design/sizes";
 import colors from "../design/colors";
 
-export default function Card({ ativo = false }) {
+export default function Card({
+        ativo = false,
+        texto = "",
+        fnConcluir = null,
+        fnExcluir = null
+    }) {
     let styles = stylesAtivo
 
     if (ativo) {
@@ -11,13 +16,13 @@ export default function Card({ ativo = false }) {
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.circulo}>
+            <TouchableOpacity onPress={fnConcluir} style={styles.circulo}>
                 {ativo && <Image style={styles.icon} source={require('../assets/check.png')} />}
             </TouchableOpacity>
 
-            <Text style={styles.text}>Lorem ipsum lorem ipsum lorem ipsum lorem ipsum</Text>
+            <Text style={styles.text}> {texto} </Text>
 
-            <TouchableOpacity>
+            <TouchableOpacity onPress={fnExcluir}>
                 <Image style={styles.lixo}
                        source={require('../assets/lixo.png')} />
             </TouchableOpacity>
